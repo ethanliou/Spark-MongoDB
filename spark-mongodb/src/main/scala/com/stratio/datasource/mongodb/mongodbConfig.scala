@@ -49,6 +49,7 @@ object MongodbConfig {
   val Collection = "collection"
   val SSLOptions = "sslOptions"
   val ReadPreference = "readPreference"
+  val ReadPreferenceTags = "readPreferenceTags"
   val ConnectTimeout = "connectTimeout"
   val ConnectionsPerHost = "connectionsPerHost"
   val MaxWaitTime = "maxWaitTime"
@@ -83,6 +84,7 @@ object MongodbConfig {
   //  Default MongoDB values
   val DefaultMongoClientOptions = new JavaMongoClientOptions.Builder().build()
   val DefaultReadPreference = "nearest"
+  val DefaultReadPreferenceTags = ""
   val DefaultConnectTimeout = DefaultMongoClientOptions.getConnectTimeout
   val DefaultConnectionsPerHost = DefaultMongoClientOptions.getConnectionsPerHost
   val DefaultMaxWaitTime = DefaultMongoClientOptions.getMaxWaitTime

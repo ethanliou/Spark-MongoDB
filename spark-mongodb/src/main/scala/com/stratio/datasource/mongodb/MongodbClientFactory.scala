@@ -19,6 +19,7 @@ import javax.net.ssl.SSLSocketFactory
 import com.stratio.datasource.mongodb.MongodbConfig._
 import com.stratio.datasource.mongodb.MongodbConfig.{ReadPreference => ProviderReadPreference}
 import com.mongodb.ServerAddress
+import com.mongodb.{TagSet,Tag}
 import com.mongodb.casbah.Imports._
 import com.mongodb.casbah.{ReadPreference, MongoClient, MongoClientOptions}
 
@@ -47,7 +48,7 @@ object MongodbClientFactory {
     val options = {
 
       val builder = new MongoClientOptions.Builder()
-        .readPreference(parseReadPreference(extractValue(clientOptions, ProviderReadPreference).getOrElse(DefaultReadPreference)))
+        .readPreference(parseReadPreference(extractValue(clientOptions, ProviderReadPreference).getOrElse(DefaultReadPreference), extractValue(clientOptions, ReadPreferenceTags).getOrElse(DefaultReadPreferenceTags)))
         .connectTimeout(extractValue[String](clientOptions, ConnectTimeout).map(_.toInt).getOrElse(DefaultConnectTimeout))
         .connectionsPerHost(extractValue[String](clientOptions, ConnectionsPerHost).map(_.toInt).getOrElse(DefaultConnectionsPerHost))
         .maxWaitTime(extractValue[String](clientOptions, MaxWaitTime).map(_.toInt).getOrElse(DefaultMaxWaitTime))
@@ -87,14 +88,18 @@ object MongodbClientFactory {
 
   }
 
-  private def parseReadPreference(readPreference: String): ReadPreference ={
+  private def parseTagSet(readPreferenceTags: String): TagSet ={
+    return new TagSet( readPreferenceTags.split(",").map(_.split(":")).filter(_.length == 2).map( kv => new Tag(kv(0),kv(1)) ).toList )
+  }
+
+  private def parseReadPreference(readPreference: String, readPreferenceTags: String): ReadPreference ={
     readPreference match{
-      case "primary"             => ReadPreference.Primary
-      case "secondary"           => ReadPreference.Secondary
-      case "nearest"             => ReadPreference.Nearest
-      case "primaryPreferred"    => ReadPreference.primaryPreferred
-      case "secondaryPreferred"  => ReadPreference.SecondaryPreferred
-      case _                     => ReadPreference.Nearest
+      case "primary"              => ReadPreference.Primary
+      case "secondary"            => ReadPreference.secondary(parseTagSet(readPreferenceTags))
+      case "nearest"              => ReadPreference.nearest(parseTagSet(readPreferenceTags))
+      case "primaryPreferred"     => ReadPreference.primaryPreferred(parseTagSet(readPreferenceTags))
+      case "secondaryPreferred"   => ReadPreference.SecondaryPreferred
+      case _                      => ReadPreference.Nearest
     }
   }
 
