@@ -16,6 +16,7 @@
 package com.stratio.datasource.mongodb
 
 import javax.net.ssl.SSLSocketFactory
+import scala.collection.JavaConversions._
 import com.stratio.datasource.mongodb.MongodbConfig._
 import com.stratio.datasource.mongodb.MongodbConfig.{ReadPreference => ProviderReadPreference}
 import com.mongodb.ServerAddress
@@ -94,12 +95,12 @@ object MongodbClientFactory {
 
   private def parseReadPreference(readPreference: String, readPreferenceTags: String): ReadPreference ={
     readPreference match{
-      case "primary"              => ReadPreference.Primary
-      case "secondary"            => ReadPreference.secondary(parseTagSet(readPreferenceTags))
-      case "nearest"              => ReadPreference.nearest(parseTagSet(readPreferenceTags))
-      case "primaryPreferred"     => ReadPreference.primaryPreferred(parseTagSet(readPreferenceTags))
-      case "secondaryPreferred"   => ReadPreference.SecondaryPreferred
-      case _                      => ReadPreference.Nearest
+      case "primary"             => ReadPreference.Primary
+      case "secondary"           => ReadPreference.secondary(parseTagSet(readPreferenceTags))
+      case "nearest"             => ReadPreference.nearest(parseTagSet(readPreferenceTags))
+      case "primaryPreferred"    => ReadPreference.primaryPreferred(parseTagSet(readPreferenceTags))
+      case "secondaryPreferred"  => ReadPreference.SecondaryPreferred
+      case _                     => ReadPreference.Nearest
     }
   }
 
